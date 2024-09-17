@@ -1,0 +1,7 @@
+package com.techfix.Service;
+
+import com.techfix.Model.Supplier;
+
+public class SupplierService extends GenericService<Supplier, Long>{
+
+}

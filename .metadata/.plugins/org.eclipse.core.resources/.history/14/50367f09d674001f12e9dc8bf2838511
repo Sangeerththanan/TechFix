@@ -1,0 +1,31 @@
+package com.techfix.Service;
+
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.techfix.Model.Pricing;
+import com.techfix.Repo.PricingRepo;
+
+@Service
+public class PricingService extends GenericService<Pricing, Long>{
+	@Autowired
+    private PricingRepo pricingRepo;
+
+    public Pricing updatePricing(Long id, double newPrice, double newDiscount, String lastUpdated) {
+        Optional<Pricing> pricingOptional = pricingRepo.findById(id);
+        if (pricingOptional.isPresent()) {
+            Pricing pricing = pricingOptional.get();
+            pricing.setPrice(newPrice);
+            pricing.setDiscount(newDiscount);
+            pricing.setLastUpdated(lastUpdated);
+            return pricingRepo.save(pricing);
+        }
+        return null;
+    }
+
+//    public Optional<Pricing> getPricingByProductId(Long productId) {
+//        return pricingRepo.getPriceByProductId(productId);
+//    }
+}

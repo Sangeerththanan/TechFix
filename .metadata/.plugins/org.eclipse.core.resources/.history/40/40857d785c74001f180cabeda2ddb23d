@@ -1,0 +1,10 @@
+package com.techfix.Repo;
+
+import org.springframework.stereotype.Repository;
+
+import com.mysql.cj.x.protobuf.MysqlxCrud.Order;
+
+@Repository
+public interface OrderRepo extends GenericRepo<Order, Long>{
+
+}

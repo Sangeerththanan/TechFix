@@ -1,0 +1,7 @@
+package com.techfix.Service;
+
+import com.techfix.Model.Pricing;
+
+public class PricingService extends GenericService<Pricing, Long>{
+
+}

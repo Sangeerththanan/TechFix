@@ -1,0 +1,5 @@
+package com.techfix.Model;
+
+public class StockDTO {
+
+}

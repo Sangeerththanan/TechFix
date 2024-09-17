@@ -1,0 +1,55 @@
+package com.techfix.Service;
+
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+
+import com.techfix.Repo.GenericRepo;
+
+
+public class GenericService<T, K> {
+
+    @Autowired
+    private GenericRepo<T, K> repo;
+
+    public List<T> getAll() {
+        return repo.findAll();
+    }
+
+    public T getById(K id) {
+        Optional<T> entity = repo.findById(id);
+        if (entity.isPresent()) {
+            return entity.get();
+        } else {
+            // Handle entity not found case
+            throw new RuntimeException("Entity not found with id: " + id);
+        }
+    }
+
+    public T create(T entity) {
+        return repo.save(entity);
+    }
+
+    public T update(T entity) {
+        // Check if the entity exists before updating
+        if (entity instanceof T) {
+            T product = (T) entity;
+            if (repo.existsById((K) T.getId())) {
+                return repo.save(entity); // Perform update
+            } else {
+                throw new RuntimeException("Cannot update non-existent product with id: " + product.getId());
+            }
+        }
+        throw new IllegalArgumentException("Unsupported entity type for update");
+    }
+
+    public void deleteById(K id) {
+        if (repo.existsById(id)) {
+            repo.deleteById(id);
+        } else {
+            // Handle entity not found case
+            throw new RuntimeException("Entity not found with id: " + id);
+        }
+    }
+}

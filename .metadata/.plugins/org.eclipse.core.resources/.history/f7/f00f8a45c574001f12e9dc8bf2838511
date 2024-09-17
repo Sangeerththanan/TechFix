@@ -1,0 +1,7 @@
+package com.techfix.Controller;
+
+import com.techfix.Model.Product;
+
+public class ProductController extends GenericController<Product, Long>{
+
+}

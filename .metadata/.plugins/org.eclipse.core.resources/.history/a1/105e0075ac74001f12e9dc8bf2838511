@@ -1,0 +1,20 @@
+package com.techfix.Service;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.techfix.Model.Inventory;
+import com.techfix.Repo.InventoryRepo;
+
+@Service
+public class InventoryService extends GenericService<Inventory, Long>{
+	@Autowired
+    private InventoryRepo repo;
+	
+	// Update stock level for a specific product
+    public Inventory updateStockLevel(Long id, int newStockLevel) {
+        Inventory inventory = getById(id);
+        inventory.setStockLevel(newStockLevel);
+        return update(inventory);
+    }
+}

@@ -1,0 +1,10 @@
+package com.techfix.Service;
+
+import org.springframework.stereotype.Service;
+
+import com.techfix.Model.Inventory;
+
+@Service
+public class InventoryService extends GenericService<Inventory, Long>{
+
+}

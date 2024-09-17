@@ -1,0 +1,13 @@
+package com.techfix.Repo;
+
+import java.util.Optional;
+
+import org.springframework.stereotype.Repository;
+
+import com.techfix.Model.Pricing;
+
+@Repository
+public interface PricingRepo extends GenericRepo<Pricing, Long>{
+	
+	public Optional<Pricing> findByProductId(Long productId);
+}

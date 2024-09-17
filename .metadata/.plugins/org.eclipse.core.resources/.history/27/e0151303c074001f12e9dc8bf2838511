@@ -1,0 +1,23 @@
+package com.techfix.Service;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+
+import com.techfix.Model.Notification;
+import com.techfix.Repo.NotificationRepo;
+
+@Service
+public class NotificationService extends GenericService<Notification, Long>{
+	@Autowired
+    private NotificationRepo repo;
+
+    // Method to get all notifications for a user
+    public List<Notification> getNotificationsByUser(Long userId) {
+        return repo.findByRecipientId(userId);
+    }
+}
