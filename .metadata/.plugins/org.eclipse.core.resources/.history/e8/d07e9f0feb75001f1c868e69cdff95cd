@@ -1,0 +1,44 @@
+package com.techfix.Service;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.stereotype.Service;
+
+import com.techfix.Model.User;
+import com.techfix.Repo.UserRepo;
+
+@Service
+public class UserService implements UserDetailsService {
+
+    @Autowired
+    private UserRepo repo;
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        User user = repo.findByUsername(username);
+        if (user == null) {
+            throw new UsernameNotFoundException("User not found");
+        }
+        return org.springframework.security.core.userdetails.User.builder()
+                .username(user.getUsername())
+                .password(user.getPassword())
+                .roles(user.getRole()) // Provide the role name without 'ROLE_' prefix
+                .build();
+    }
+
+    public String addUser(User user) {
+        String encodedPassword = new BCryptPasswordEncoder().encode(user.getPassword());
+        user.setPassword(encodedPassword);
+        repo.save(user);
+        return "User added successfully";
+    }
+
+    public boolean authenticateUser(String username, String password) {
+        UserDetails userDetails = loadUserByUsername(username);
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        return passwordEncoder.matches(password, userDetails.getPassword());
+    }
+}
