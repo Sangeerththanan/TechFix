@@ -12,6 +12,7 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import RegisterForm from './components/RegisterForm';
 import AdminLoginForm from './components/AdminLoginForm.js';
+import AboutUs from './components/AboutUs.js';
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
         <Route path="/admin/dashboard" element={<Dashboard />} />
         <Route path="/register" element={<RegisterForm />} />
         <Route path="/login" element={<Authentication />} />
+        <Route path="/aboutus" element={<AboutUs />} />
       </Routes>
     </Router>
   );
