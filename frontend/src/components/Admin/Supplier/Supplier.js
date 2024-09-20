@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import axiosInstance from '../../Service/axiosInstance'; // Adjust the path accordingly
 import UpdateButton from '../../Button/UpdateButton';
 import DeleteButton from '../../Button/DeleteButton';
 import CancelButton from '../../Button/CancelButton';
@@ -22,7 +22,7 @@ function Supplier() {
     useEffect(() => {
         const fetchSuppliers = async () => {
             try {
-                const response = await axios.get('http://localhost:8080/supplier');
+                const response = await axiosInstance.get('/supplier');
                 setSuppliers(response.data);
             } catch (error) {
                 console.error('Error fetching suppliers:', error);
@@ -45,8 +45,8 @@ function Supplier() {
     const handleSubmitAdd = async (e) => {
         e.preventDefault();
         try {
-            await axios.post('http://localhost:8080/supplier', newSupplier);
-            const response = await axios.get('http://localhost:8080/supplier');
+            await axiosInstance.post('/supplier', newSupplier);
+            const response = await axiosInstance.get('/supplier');
             setSuppliers(response.data);
             setIsAddModalOpen(false);
             setNewSupplier({ name: '', apiUrl: '', contactInfo: '', status: '' });
@@ -59,8 +59,8 @@ function Supplier() {
     const handleSubmitUpdate = async (e) => {
         e.preventDefault();
         try {
-            await axios.put(`http://localhost:8080/supplier/${selectedSupplier.id}`, selectedSupplier);
-            const response = await axios.get('http://localhost:8080/supplier');
+            await axiosInstance.put(`/supplier/${selectedSupplier.id}`, selectedSupplier);
+            const response = await axiosInstance.get('/supplier');
             setSuppliers(response.data);
             setIsUpdateModalOpen(false);
             setSelectedSupplier(null);
@@ -72,8 +72,8 @@ function Supplier() {
     // Handle delete supplier
     const handleDeleteSupplier = async () => {
         try {
-            await axios.delete(`http://localhost:8080/supplier/${selectedSupplier.id}`);
-            const response = await axios.get('http://localhost:8080/supplier');
+            await axiosInstance.delete(`/supplier/${selectedSupplier.id}`);
+            const response = await axiosInstance.get('/supplier');
             setSuppliers(response.data);
             setIsDeleteModalOpen(false);
             setSelectedSupplier(null);

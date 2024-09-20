@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import axiosInstance from '../../Service/axiosInstance'; // Adjust the import path as needed
 import UpdateButton from '../../Button/UpdateButton';
 import DeleteButton from '../../Button/DeleteButton';
 import CancelButton from '../../Button/CancelButton';
@@ -9,7 +9,7 @@ import AddButton from '../../Button/AddButton';
 
 function Inventory() {
   const [inventory, setInventory] = useState([]);
-  const [suppliers, setSuppliers] = useState([]); // State for suppliers
+  const [suppliers, setSuppliers] = useState([]);
   const [newInventory, setNewInventory] = useState({
     productCode: '',
     supplier: '',
@@ -27,7 +27,7 @@ function Inventory() {
   useEffect(() => {
     const fetchInventory = async () => {
       try {
-        const response = await axios.get('http://localhost:8080/inventory');
+        const response = await axiosInstance.get('/inventory');
         setInventory(response.data);
       } catch (error) {
         console.error('Error fetching inventory:', error);
@@ -36,8 +36,8 @@ function Inventory() {
 
     const fetchSuppliers = async () => {
       try {
-        const response = await axios.get('http://localhost:8080/supplier');
-        setSuppliers(response.data); // Set suppliers
+        const response = await axiosInstance.get('/supplier');
+        setSuppliers(response.data);
       } catch (error) {
         console.error('Error fetching suppliers:', error);
       }
@@ -63,11 +63,11 @@ function Inventory() {
     try {
       const newInventoryWithTime = {
         ...newInventory,
-        supplier: { id: newInventory.supplier },  // Wrap supplier as an object with an 'id' field
-        lastUpdated: new Date().toISOString(),   // Current system time
+        supplier: { id: newInventory.supplier },
+        lastUpdated: new Date().toISOString(),
       };
-      await axios.post('http://localhost:8080/inventory', newInventoryWithTime);
-      const response = await axios.get('http://localhost:8080/inventory');
+      await axiosInstance.post('/inventory', newInventoryWithTime);
+      const response = await axiosInstance.get('/inventory');
       setInventory(response.data);
       setIsAddModalOpen(false);
       setNewInventory({ productCode: '', supplier: '', stockLevel: 0, threshold: 0 });
@@ -80,8 +80,8 @@ function Inventory() {
   const handleSubmitUpdate = async (e) => {
     e.preventDefault();
     try {
-      await axios.put(`http://localhost:8080/inventory/stock/${selectedInventory.id}`, { stockLevel: selectedInventory.stockLevel });
-      const response = await axios.get('http://localhost:8080/inventory');
+      await axiosInstance.put(`/inventory/stock/${selectedInventory.id}`, { stockLevel: selectedInventory.stockLevel });
+      const response = await axiosInstance.get('/inventory');
       setInventory(response.data);
       setIsUpdateModalOpen(false);
       setSelectedInventory(null);
@@ -93,8 +93,8 @@ function Inventory() {
   // Handle delete inventory
   const handleDeleteInventory = async () => {
     try {
-      await axios.delete(`http://localhost:8080/inventory/${selectedInventory.id}`);
-      const response = await axios.get('http://localhost:8080/inventory');
+      await axiosInstance.delete(`/inventory/${selectedInventory.id}`);
+      const response = await axiosInstance.get('/inventory');
       setInventory(response.data);
       setIsDeleteModalOpen(false);
       setSelectedInventory(null);
@@ -106,9 +106,9 @@ function Inventory() {
   // Handle viewing stock levels
   const handleViewStockLevels = async () => {
     try {
-      const response = await axios.get('http://localhost:8080/inventory/stock');
+      const response = await axiosInstance.get('/inventory/stock');
       setStockLevels(response.data);
-      setIsStockLevelsModalOpen(true); // Open modal for stock levels
+      setIsStockLevelsModalOpen(true);
     } catch (error) {
       console.error('Error fetching stock levels:', error);
     }
@@ -250,9 +250,7 @@ function Inventory() {
                 />
               </div>
               <div className='flex justify-end mt-4'>
-                <button type="submit" className="bg-yellow-500 text-white p-2 rounded">
-                  Update Inventory
-                </button>
+                <UpdateButton label="Update Stock Level" />
                 <CancelButton onClick={() => setIsUpdateModalOpen(false)} />
               </div>
             </form>
@@ -264,40 +262,34 @@ function Inventory() {
       {isDeleteModalOpen && selectedInventory && (
         <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center">
           <div className="bg-white p-6 rounded shadow-lg max-w-sm w-full">
-            <h3 className="text-xl font-semibold mb-4">Confirm Delete</h3>
-            <p>Are you sure you want to delete the inventory item with product code "{selectedInventory.productCode}"?</p>
-            <div className="flex justify-end mt-4">
-              <button
-                className="bg-red-500 text-white p-2 rounded"
-                onClick={handleDeleteInventory}
-              >
-                Delete
-              </button>
+            <h4 className="text-lg font-semibold mb-4">Are you sure you want to delete this item?</h4>
+            <p>{selectedInventory.productCode}</p>
+            <div className='flex justify-end mt-4'>
+              <DeleteButton onClick={handleDeleteInventory} />
               <CancelButton onClick={() => setIsDeleteModalOpen(false)} />
             </div>
           </div>
         </div>
       )}
 
-      {/* View Stock Levels Modal */}
+      {/* Stock Levels Modal */}
       {isStockLevelsModalOpen && (
         <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center">
           <div className="bg-white p-6 rounded shadow-lg max-w-sm w-full">
-            <h3 className="text-xl font-semibold mb-4">Stock Levels</h3>
+            <h4 className="text-lg font-semibold mb-4">Stock Levels</h4>
             <ul>
-              {stockLevels.map((item) => (
-                <li key={item.productCode} className="mb-2">
-                  {item.productCode}: {item.stockLevel}
+              {stockLevels.map((level) => (
+                <li key={level.id}>
+                  {level.productCode}: {level.stockLevel}
                 </li>
               ))}
             </ul>
             <div className="flex justify-end mt-4">
-              <CloseButton onClick={() => setIsStockLevelsModalOpen(false)}/>
-            </div>
+        <CloseButton onClick={() => setIsStockLevelsModalOpen(false)} />
+      </div>
           </div>
         </div>
       )}
-
       {/* View Stock Levels Button */}
       <div className="fixed bottom-4 left-4">
         <ViewButton onClick={handleViewStockLevels} label="View Stock Levels"/>

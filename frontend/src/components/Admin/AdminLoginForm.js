@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { setToken } from '../Service/tokenService';
 
 const AdminLoginForm = () => {
   const [formData, setFormData] = useState({
@@ -29,8 +30,8 @@ const AdminLoginForm = () => {
       });
       const data = await response.json();
       if (response.ok) {
+        setToken(data.token); // Use the setToken function
         setMessage('Login successful!');
-        // Navigate to Dashboard after successful login
         navigate('/admin/dashboard');
       } else {
         setMessage(`Login failed: ${data.message}`);
@@ -39,6 +40,7 @@ const AdminLoginForm = () => {
       setMessage('Error during login. Please try again.');
     }
   };
+  
 
   return (
     <div className="flex justify-center items-center h-screen bg-gray-200">

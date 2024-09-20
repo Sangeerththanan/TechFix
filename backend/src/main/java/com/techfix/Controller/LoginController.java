@@ -1,8 +1,5 @@
 package com.techfix.Controller;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +11,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.techfix.Model.User;
 import com.techfix.Service.UserService;
+import com.techfix.Security.JwtUtil;
+
+import java.util.HashMap;
+import java.util.Map;
+import org.springframework.security.core.userdetails.UserDetails; // Import UserDetails
 
 @RestController
 @RequestMapping("/user")
@@ -22,6 +24,9 @@ public class LoginController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private JwtUtil jwtUtil;
 
     @PostMapping("/register")
     public ResponseEntity<Map<String, String>> registerUser(@RequestBody User user) {
@@ -33,11 +38,14 @@ public class LoginController {
 
     @PostMapping("/login")
     public ResponseEntity<Map<String, String>> loginUser(@RequestBody User user) {
+        UserDetails userDetails = userService.loadUserByUsername(user.getUsername()); // Load UserDetails
         boolean isAuthenticated = userService.authenticateUser(user.getUsername(), user.getPassword());
         Map<String, String> jsonResponse = new HashMap<>();
-        
+
         if (isAuthenticated) {
-            jsonResponse.put("message", "Login successful");
+            // Generate token here
+            String token = jwtUtil.generateToken(userDetails); // Pass UserDetails
+            jsonResponse.put("token", token); // Return the token
             return new ResponseEntity<>(jsonResponse, HttpStatus.OK);
         } else {
             jsonResponse.put("message", "Invalid credentials");

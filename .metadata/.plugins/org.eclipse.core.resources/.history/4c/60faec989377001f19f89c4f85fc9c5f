@@ -1,0 +1,5 @@
+package com.techfix.Security;
+
+public class WebConfig {
+
+}

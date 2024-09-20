@@ -1,261 +1,292 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import axiosInstance from '../../Service/axiosInstance'; // Adjust the import path as necessary
+import UpdateButton from '../../Button/UpdateButton';
 import DeleteButton from '../../Button/DeleteButton';
 import CancelButton from '../../Button/CancelButton';
+import ViewButton from '../../Button/ViewButton';
+import CloseButton from '../../Button/CloseButton';
 import AddButton from '../../Button/AddButton';
 
-function Analytics() {
-    const [analytics, setAnalytics] = useState([]);
-    const [newAnalytics, setNewAnalytics] = useState({
-        reportType: '',
-        totalSales: '',
-        topProduct: '',
-        salesByRegion: { North: '', South: '', West: '' },
-        createdAt: ''
-    });
+function Inventory() {
+  const [inventory, setInventory] = useState([]);
+  const [suppliers, setSuppliers] = useState([]);
+  const [newInventory, setNewInventory] = useState({
+    productCode: '',
+    supplier: '',
+    stockLevel: 0,
+    threshold: 0,
+  });
+  const [selectedInventory, setSelectedInventory] = useState(null);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isStockLevelsModalOpen, setIsStockLevelsModalOpen] = useState(false);
+  const [stockLevels, setStockLevels] = useState([]);
 
-    const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-    const [selectedAnalytics, setSelectedAnalytics] = useState(null);
-
-    useEffect(() => {
-        fetchAnalytics();
-    }, []);
-
-    const fetchAnalytics = async () => {
-        try {
-            const response = await axios.get('http://localhost:8080/analytics');
-            setAnalytics(response.data);
-        } catch (error) {
-            console.error('Error fetching analytics:', error);
-        }
+  useEffect(() => {
+    const fetchInventory = async () => {
+      try {
+        const response = await axiosInstance.get('/inventory');
+        setInventory(response.data);
+      } catch (error) {
+        console.error('Error fetching inventory:', error);
+      }
     };
 
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        const parsedValue = isNaN(value) ? value : Number(value);
-
-        if (name.startsWith('salesByRegion.')) {
-            const region = name.split('.')[1];
-            setNewAnalytics(prev => ({
-                ...prev,
-                salesByRegion: { ...prev.salesByRegion, [region]: parsedValue }
-            }));
-        } else {
-            setNewAnalytics(prev => ({ ...prev, [name]: parsedValue }));
-        }
+    const fetchSuppliers = async () => {
+      try {
+        const response = await axiosInstance.get('/supplier');
+        setSuppliers(response.data);
+      } catch (error) {
+        console.error('Error fetching suppliers:', error);
+      }
     };
 
-    const handleSubmitAdd = async (e) => {
-        e.preventDefault();
-        try {
-            const formattedData = {
-                reportType: newAnalytics.reportType,
-                data: JSON.stringify({
-                    totalSales: parseFloat(newAnalytics.totalSales) || 0,
-                    topProduct: newAnalytics.topProduct,
-                    salesByRegion: newAnalytics.salesByRegion
-                }),
-                createdAt: newAnalytics.createdAt
-            };
-            const response = await axios.post('http://localhost:8080/analytics', formattedData);
-            console.log('Added analytics:', response.data);
-            fetchAnalytics();
-            resetNewAnalytics();
-            setIsAddModalOpen(false);
-        } catch (error) {
-            console.error('Error adding analytics:', error.response ? error.response.data : error.message);
-        }
-    };
+    fetchInventory();
+    fetchSuppliers();
+  }, []);
 
-    const handleDeleteAnalytics = async () => {
-        if (selectedAnalytics && selectedAnalytics.id) {
-            try {
-                await axios.delete(`http://localhost:8080/analytics/${selectedAnalytics.id}`);
-                fetchAnalytics();
-                setIsDeleteModalOpen(false);
-                setSelectedAnalytics(null);
-            } catch (error) {
-                console.error('Error deleting analytics:', error);
-            }
-        } else {
-            console.error('No selected analytics or missing ID for deletion.');
-        }
-    };
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    if (isUpdateModalOpen) {
+      setSelectedInventory({ ...selectedInventory, [name]: value });
+    } else {
+      setNewInventory({ ...newInventory, [name]: value });
+    }
+  };
 
-    const resetNewAnalytics = () => {
-        setNewAnalytics({
-            reportType: '',
-            totalSales: '',
-            topProduct: '',
-            salesByRegion: { North: '', South: '', West: '' },
-            createdAt: ''
-        });
-    };
+  const handleSubmitAdd = async (e) => {
+    e.preventDefault();
+    try {
+      const newInventoryWithTime = {
+        ...newInventory,
+        supplier: { id: newInventory.supplier },
+        lastUpdated: new Date().toISOString(),
+      };
+      await axiosInstance.post('/inventory', newInventoryWithTime);
+      const response = await axiosInstance.get('/inventory');
+      setInventory(response.data);
+      setIsAddModalOpen(false);
+      setNewInventory({ productCode: '', supplier: '', stockLevel: 0, threshold: 0 });
+    } catch (error) {
+      console.error('Error adding inventory:', error);
+    }
+  };
 
-    return (
-        <div className="p-5 bg-gray-100 min-h-screen relative">
-            <h3 className="text-xl font-semibold mb-2">Analytics Reports</h3>
-            <table className="table-auto w-full bg-white shadow rounded">
-                <thead>
-                    <tr className="bg-gray-200">
-                        <th className="px-4 py-2">Report Type</th>
-                        <th className="px-4 py-2">Total Sales</th>
-                        <th className="px-4 py-2">Top Product</th>
-                        <th className="px-4 py-2">Sales by Region</th>
-                        <th className="px-4 py-2">Created At</th>
-                        <th className="px-4 py-2">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {analytics.map((report) => {
-                        let data;
-                        try {
-                            if (report.data) {
-                                data = JSON.parse(report.data);
-                            } else {
-                                data = {
-                                    totalSales: 0,
-                                    topProduct: 'N/A',
-                                    salesByRegion: { North: 0, South: 0, West: 0 }
-                                };
-                            }
-                        } catch (error) {
-                            console.error('Error parsing analytics data:', error);
-                            return null;
-                        }
+  const handleSubmitUpdate = async (e) => {
+    e.preventDefault();
+    try {
+      await axiosInstance.put(`/inventory/stock/${selectedInventory.id}`, { stockLevel: selectedInventory.stockLevel });
+      const response = await axiosInstance.get('/inventory');
+      setInventory(response.data);
+      setIsUpdateModalOpen(false);
+      setSelectedInventory(null);
+    } catch (error) {
+      console.error('Error updating inventory:', error);
+    }
+  };
 
-                        const salesByRegion = data.salesByRegion;
+  const handleDeleteInventory = async () => {
+    try {
+      await axiosInstance.delete(`/inventory/${selectedInventory.id}`);
+      const response = await axiosInstance.get('/inventory');
+      setInventory(response.data);
+      setIsDeleteModalOpen(false);
+      setSelectedInventory(null);
+    } catch (error) {
+      console.error('Error deleting inventory:', error);
+    }
+  };
 
-                        return (
-                            <tr key={report.id} className="border-t">
-                                <td className="px-4 py-2">{report.reportType}</td>
-                                <td className="px-4 py-2">{data.totalSales}</td>
-                                <td className="px-4 py-2">{data.topProduct}</td>
-                                <td className="px-4 py-2">
-                                    {Object.entries(salesByRegion).map(([region, sales]) => (
-                                        <div key={region}>
-                                            {region}: {sales}
-                                        </div>
-                                    ))}
-                                </td>
-                                <td className="px-4 py-2">{report.createdAt}</td>
-                                <td className="px-4 py-2 text-center flex justify-center space-x-2">
-                                    <DeleteButton
-                                        onClick={() => {
-                                            setSelectedAnalytics(report);
-                                            setIsDeleteModalOpen(true);
-                                        }}
-                                    />
-                                </td>
-                            </tr>
-                        );
-                    })}
-                </tbody>
-            </table>
+  const handleViewStockLevels = async () => {
+    try {
+      const response = await axiosInstance.get('/inventory/stock');
+      setStockLevels(response.data);
+      setIsStockLevelsModalOpen(true);
+    } catch (error) {
+      console.error('Error fetching stock levels:', error);
+    }
+  };
 
-            <div className="fixed bottom-4 right-4">
-                <button
-                    className="bg-blue-500 text-white p-3 rounded-full"
-                    onClick={() => setIsAddModalOpen(true)}
+  return (
+    <div className="p-5 bg-gray-100 min-h-screen relative">
+      {/* Inventory Table */}
+      <div>
+        <h3 className="text-xl font-semibold mb-2">Inventory List</h3>
+        <table className="table-auto w-full bg-white shadow rounded">
+          <thead>
+            <tr className="bg-gray-200">
+              <th className="px-4 py-2">Product Code</th>
+              <th className="px-4 py-2">Supplier</th>
+              <th className="px-4 py-2">Stock Level</th>
+              <th className="px-4 py-2">Threshold</th>
+              <th className="px-4 py-2">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {inventory.map((item) => (
+              <tr key={item.id} className="border-t">
+                <td className="px-4 py-2">{item.productCode}</td>
+                <td className="px-4 py-2">{item.supplier.name}</td>
+                <td className="px-4 py-2">{item.stockLevel}</td>
+                <td className="px-4 py-2">{item.threshold}</td>
+                <td className="px-4 py-2 text-center flex justify-center space-x-2">
+                  <UpdateButton
+                    onClick={() => {
+                      setSelectedInventory(item);
+                      setIsUpdateModalOpen(true);
+                    }}
+                  />
+                  <DeleteButton
+                    onClick={() => {
+                      setSelectedInventory(item);
+                      setIsDeleteModalOpen(true);
+                    }}
+                  />
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Add Inventory Button */}
+      <div className="fixed bottom-4 right-4">
+        <button
+          className="bg-blue-500 text-white p-3 rounded-full"
+          onClick={() => setIsAddModalOpen(true)}
+        >
+          Add Inventory
+        </button>
+      </div>
+
+      {/* Add Inventory Modal */}
+      {isAddModalOpen && (
+        <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center">
+          <div className="bg-white p-6 rounded shadow-lg max-w-sm w-full">
+            <form onSubmit={handleSubmitAdd}>
+              <div className="mb-4">
+                <label className="block text-sm font-medium mb-1" htmlFor="productCode">Product Code</label>
+                <input
+                  type="text"
+                  id="productCode"
+                  name="productCode"
+                  value={newInventory.productCode}
+                  onChange={handleChange}
+                  className="border p-2 rounded w-full"
+                  required
+                />
+              </div>
+              <div className="mb-4">
+                <label className="block text-sm font-medium mb-1" htmlFor="supplier">Supplier</label>
+                <select
+                  id="supplier"
+                  name="supplier"
+                  value={newInventory.supplier}
+                  onChange={handleChange}
+                  className="border p-2 rounded w-full"
+                  required
                 >
-                    Add Analytics
-                </button>
-            </div>
-
-            {/* Add Analytics Modal */}
-            {isAddModalOpen && (
-                <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center">
-                    <div className="bg-white p-6 rounded shadow-lg max-w-sm w-full">
-                        <form onSubmit={handleSubmitAdd}>
-                            <div className="mb-4">
-                                <label className="block text-sm font-medium mb-1" htmlFor="reportType">Report Type</label>
-                                <input
-                                    type="text"
-                                    id="reportType"
-                                    name="reportType"
-                                    value={newAnalytics.reportType}
-                                    onChange={handleChange}
-                                    className="border p-2 rounded w-full"
-                                    required
-                                />
-                            </div>
-                            <div className="mb-4">
-                                <label className="block text-sm font-medium mb-1" htmlFor="totalSales">Total Sales</label>
-                                <input
-                                    type="number"
-                                    id="totalSales"
-                                    name="totalSales"
-                                    value={newAnalytics.totalSales}
-                                    onChange={handleChange}
-                                    className="border p-2 rounded w-full"
-                                    required
-                                />
-                            </div>
-                            <div className="mb-4">
-                                <label className="block text-sm font-medium mb-1" htmlFor="topProduct">Top Product</label>
-                                <input
-                                    type="text"
-                                    id="topProduct"
-                                    name="topProduct"
-                                    value={newAnalytics.topProduct}
-                                    onChange={handleChange}
-                                    className="border p-2 rounded w-full"
-                                    required
-                                />
-                            </div>
-                            <div className="mb-4">
-                                <label className="block text-sm font-medium mb-1">Sales by Region</label>
-                                {Object.keys(newAnalytics.salesByRegion).map((region) => (
-                                    <div key={region} className="mb-2 flex justify-between items-center">
-                                        <span>{region}</span>
-                                        <input
-                                            type="number"
-                                            name={`salesByRegion.${region}`}
-                                            value={newAnalytics.salesByRegion[region]}
-                                            onChange={handleChange}
-                                            className="border p-2 rounded w-1/2"
-                                            required
-                                        />
-                                    </div>
-                                ))}
-                            </div>
-                            <div className="mb-4">
-                                <label className="block text-sm font-medium mb-1" htmlFor="createdAt">Created At</label>
-                                <input
-                                    type="date"
-                                    id="createdAt"
-                                    name="createdAt"
-                                    value={newAnalytics.createdAt}
-                                    onChange={handleChange}
-                                    className="border p-2 rounded w-full"
-                                    required
-                                />
-                            </div>
-                            <div className="flex justify-end">
-                                <AddButton label="Add"/>
-                                <CancelButton onClick={() => setIsAddModalOpen(false)} />
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            )}
-
-            {/* Delete Confirmation Modal */}
-            {isDeleteModalOpen && (
-                <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center">
-                    <div className="bg-white p-6 rounded shadow-lg max-w-sm w-full">
-                        <h4 className="text-lg mb-4">Confirm Delete</h4>
-                        <p>Are you sure you want to delete this analytics report?</p>
-                        <div className="flex justify-end mt-4">
-                            <DeleteButton onClick={handleDeleteAnalytics}/>
-                            <CancelButton onClick={() => setIsDeleteModalOpen(false)} />
-                        </div>
-                    </div>
-                </div>
-            )}
+                  <option value="" disabled>Select Supplier</option>
+                  {suppliers.map((supplier) => (
+                    <option key={supplier.id} value={supplier.id}>{supplier.name}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="mb-4">
+                <label className="block text-sm font-medium mb-1" htmlFor="stockLevel">Stock Level</label>
+                <input
+                  type="number"
+                  id="stockLevel"
+                  name="stockLevel"
+                  value={newInventory.stockLevel}
+                  onChange={handleChange}
+                  className="border p-2 rounded w-full"
+                  required
+                />
+              </div>
+              <div className="mb-4">
+                <label className="block text-sm font-medium mb-1" htmlFor="threshold">Threshold</label>
+                <input
+                  type="number"
+                  id="threshold"
+                  name="threshold"
+                  value={newInventory.threshold}
+                  onChange={handleChange}
+                  className="border p-2 rounded w-full"
+                  required
+                />
+              </div>
+              <div className='flex justify-end mt-4'>
+                <AddButton label="Add Inventory" />
+                <CancelButton onClick={() => setIsAddModalOpen(false)} />
+              </div>
+            </form>
+          </div>
         </div>
-    );
+      )}
+
+      {/* Update Modal */}
+      {isUpdateModalOpen && selectedInventory && (
+        <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center">
+          <div className="bg-white p-6 rounded shadow-lg max-w-sm w-full">
+            <form onSubmit={handleSubmitUpdate}>
+              <div className="mb-4">
+                <label className="block text-sm font-medium mb-1" htmlFor="stockLevel">Stock Level</label>
+                <input
+                  type="number"
+                  id="stockLevel"
+                  name="stockLevel"
+                  value={selectedInventory.stockLevel}
+                  onChange={handleChange}
+                  className="border p-2 rounded w-full"
+                  required
+                />
+              </div>
+              <div className='flex justify-end mt-4'>
+                <button type="submit" className="bg-yellow-500 text-white p-2 rounded">
+                  Update
+                </button>
+                <CancelButton onClick={() => setIsUpdateModalOpen(false)} />
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {isDeleteModalOpen && selectedInventory && (
+        <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center">
+          <div className="bg-white p-6 rounded shadow-lg max-w-sm w-full">
+            <h3 className="text-lg font-semibold mb-4">Are you sure you want to delete this inventory?</h3>
+            <div className='flex justify-end mt-4'>
+              <DeleteButton onClick={handleDeleteInventory} />
+              <CancelButton onClick={() => setIsDeleteModalOpen(false)} />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Stock Levels Modal */}
+      {isStockLevelsModalOpen && (
+        <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center">
+          <div className="bg-white p-6 rounded shadow-lg max-w-md w-full">
+            <h3 className="text-xl font-semibold mb-4">Stock Levels</h3>
+            <ul>
+              {stockLevels.map((level) => (
+                <li key={level.id} className="mb-2">
+                  {level.productCode}: {level.stockLevel}
+                </li>
+              ))}
+            </ul>
+            <div className='flex justify-end mt-4'>
+              <CloseButton onClick={() => setIsStockLevelsModalOpen(false)} />
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
 }
 
-export default Analytics;
+export default Inventory;
