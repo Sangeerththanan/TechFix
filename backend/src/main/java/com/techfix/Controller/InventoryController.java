@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -18,6 +19,7 @@ import com.techfix.Service.InventoryService;
 
 @RestController
 @RequestMapping("/inventory")
+@CrossOrigin(origins = "http://localhost:3000")
 public class InventoryController extends GenericController<Inventory, Long>{
 	@Autowired
 	private InventoryService service;

@@ -1,6 +1,6 @@
 import React from 'react';
 
-const CancelButton = ({ onClick }) => {
+const CancelButton = ({ onClick, label }) => {
   return (
     <button
       onClick={onClick}

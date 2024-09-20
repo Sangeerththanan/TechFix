@@ -3,6 +3,7 @@ import axios from 'axios';
 import UpdateButton from '../../Button/UpdateButton';
 import DeleteButton from '../../Button/DeleteButton';
 import CancelButton from '../../Button/CancelButton';
+import AddButton from '../../Button/AddButton';
 
 function Supplier() {
     const [suppliers, setSuppliers] = useState([]);
@@ -184,9 +185,7 @@ function Supplier() {
                                 />
                             </div>
                             <div className='flex justify-end mt-4'>
-                                <button type="submit" className="bg-blue-500 text-white p-2 rounded">
-                                    Add Supplier
-                                </button>
+                                <AddButton label="Add Supplier"/>
                                 <CancelButton onClick={() => setIsAddModalOpen(false)} />
                             </div>
                         </form>

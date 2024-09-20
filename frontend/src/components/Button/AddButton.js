@@ -1,12 +1,12 @@
 import React from 'react';
 
-const AddButton = ({ onClick }) => {
+const AddButton = ({ onClick, label }) => {
   return (
-    <button
-      onClick={onClick}
-      className="bg-blue-500 text-white p-2 rounded"
+    <button type="submit" 
+    className="bg-blue-500 text-white p-2 rounded"
+    onClick={onClick}
     >
-      Add
+      {label}
     </button>
   );
 };

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import DeleteButton from '../../Button/DeleteButton';
 import CancelButton from '../../Button/CancelButton';
+import AddButton from '../../Button/AddButton';
 
 function Analytics() {
     const [analytics, setAnalytics] = useState([]);
@@ -232,8 +233,8 @@ function Analytics() {
                                 />
                             </div>
                             <div className="flex justify-end">
+                                <AddButton label="Add"/>
                                 <CancelButton onClick={() => setIsAddModalOpen(false)} />
-                                <button type="submit" className="bg-blue-500 text-white p-2 rounded ml-2">Add</button>
                             </div>
                         </form>
                     </div>
@@ -247,13 +248,8 @@ function Analytics() {
                         <h4 className="text-lg mb-4">Confirm Delete</h4>
                         <p>Are you sure you want to delete this analytics report?</p>
                         <div className="flex justify-end mt-4">
+                            <DeleteButton onClick={handleDeleteAnalytics}/>
                             <CancelButton onClick={() => setIsDeleteModalOpen(false)} />
-                            <button
-                                className="bg-red-500 text-white p-2 rounded ml-2"
-                                onClick={handleDeleteAnalytics}
-                            >
-                                Delete
-                            </button>
                         </div>
                     </div>
                 </div>

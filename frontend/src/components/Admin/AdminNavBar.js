@@ -28,6 +28,13 @@ const AdminNavBar = ({ setSelectedComponent }) => {
                     >
                         Analytics
                     </NavLink>
+                    <NavLink
+                        to="#"
+                        onClick={() => setSelectedComponent('inventory')}
+                        className="text-gray-300 hover:text-white px-4"
+                    >
+                        Inventory
+                    </NavLink>
                 </div>
             </div>
         </nav>
