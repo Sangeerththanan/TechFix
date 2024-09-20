@@ -1,6 +1,6 @@
 import React from 'react';
 import HomePage from './components/HomePage';
-import Dashboard from './components/Dashboard';
+import Dashboard from './components/Admin/Dashboard.js';
 import SupplierManagement from './components/SupplierManagement';
 import QuotingSystem from './components/QuotingSystem';
 import InventoryViewer from './components/InventoryViewer';
@@ -11,8 +11,8 @@ import Authentication from './components/Authentication';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import RegisterForm from './components/RegisterForm';
-import AdminLoginForm from './components/AdminLoginForm.js';
 import AboutUs from './components/AboutUs.js';
+import AdminLoginForm from './components/Admin/AdminLoginForm.js';
 
 function App() {
   return (

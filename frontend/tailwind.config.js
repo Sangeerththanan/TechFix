@@ -4,7 +4,7 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        navBackground: '#181818', // Dark gray for the navbar background
+        navBackground: '#708090',
         navMenu: '#333333', // Light gray for the menu items
       },
     },
