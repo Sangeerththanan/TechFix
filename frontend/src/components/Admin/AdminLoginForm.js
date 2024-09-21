@@ -30,7 +30,8 @@ const AdminLoginForm = () => {
       });
       const data = await response.json();
       if (response.ok) {
-        setToken(data.token); // Use the setToken function
+        setToken(data.token); // Store the token
+        localStorage.setItem('authToken', data.token); // Save token in localStorage
         setMessage('Login successful!');
         navigate('/admin/dashboard');
       } else {
@@ -40,7 +41,6 @@ const AdminLoginForm = () => {
       setMessage('Error during login. Please try again.');
     }
   };
-  
 
   return (
     <div className="flex justify-center items-center h-screen bg-gray-200">

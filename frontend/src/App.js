@@ -1,14 +1,13 @@
 import React from 'react';
-import HomePage from './components/HomePage';
-import Dashboard from './components/Admin/Dashboard.js';
-import Authentication from './components/Authentication';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import HomePage from './components/HomePage';
+import Dashboard from './components/Admin/Dashboard';
+import Authentication from './components/Authentication';
 import Navbar from './components/Navbar';
 import RegisterForm from './components/RegisterForm';
-import AboutUs from './components/AboutUs.js';
-import AdminLoginForm from './components/Admin/AdminLoginForm.js';
-import Product from './components/Admin/Product/Product.js';
-import Supplier from './components/Admin/Supplier/Supplier.js';
+import AboutUs from './components/AboutUs';
+import AdminLoginForm from './components/Admin/AdminLoginForm';
+import ProtectedRoute from './components/ProtectedRoute'; // Import ProtectedRoute
 
 function App() {
   return (
@@ -20,9 +19,16 @@ function App() {
         <Route path="/register" element={<RegisterForm />} />
         <Route path="/login" element={<Authentication />} />
         <Route path="/aboutus" element={<AboutUs />} />
-        <Route path="/admin/dashboard" element={<Dashboard />} />
-        <Route path="/dashboard/products" component={Product} />
-        <Route path="/dashboard/suppliers" component={Supplier} />
+        
+        {/* Protected Route for Dashboard */}
+        <Route
+          path="/admin/dashboard"
+          element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
     </Router>
   );

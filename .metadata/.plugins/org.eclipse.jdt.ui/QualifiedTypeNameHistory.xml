@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <qualifiedTypeNameHistroy>
-    <fullyQualifiedTypeName name="jakarta.annotation.Generated"/>
-    <fullyQualifiedTypeName name="jakarta.persistence.ManyToOne"/>
     <fullyQualifiedTypeName name="jakarta.persistence.Entity"/>
     <fullyQualifiedTypeName name="jakarta.persistence.Id"/>
     <fullyQualifiedTypeName name="jakarta.persistence.GeneratedValue"/>
@@ -59,4 +57,7 @@
     <fullyQualifiedTypeName name="java.time.LocalDateTime"/>
     <fullyQualifiedTypeName name="java.beans.Customizer"/>
     <fullyQualifiedTypeName name="org.springframework.cglib.core.Customizer"/>
+    <fullyQualifiedTypeName name="com.techfix.Service.UserService"/>
+    <fullyQualifiedTypeName name="org.apache.catalina.filters.CorsFilter"/>
+    <fullyQualifiedTypeName name="org.springframework.web.filter.CorsFilter"/>
 </qualifiedTypeNameHistroy>
