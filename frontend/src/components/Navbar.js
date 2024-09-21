@@ -22,7 +22,9 @@ const Navbar = () => {
             <li className="p-2 hover:bg-navMenu cursor-pointer">
               <Link to="/aboutus">About Us</Link>
             </li>
-            <li className="p-2 hover:bg-navMenu cursor-pointer">Our Products</li>
+            <li className="p-2 hover:bg-navMenu cursor-pointer">
+              <Link to="/products">Our Products</Link>
+            </li>
             <li className="p-2 hover:bg-navMenu cursor-pointer">Our Services</li>
             <li className="p-2 hover:bg-navMenu cursor-pointer">Careers</li>
           </ul>

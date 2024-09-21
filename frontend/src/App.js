@@ -8,6 +8,7 @@ import RegisterForm from './components/RegisterForm';
 import AboutUs from './components/AboutUs';
 import AdminLoginForm from './components/Admin/AdminLoginForm';
 import ProtectedRoute from './components/ProtectedRoute'; // Import ProtectedRoute
+import ProductGallery from './components/ProductGallery';
 
 function App() {
   return (
@@ -19,6 +20,8 @@ function App() {
         <Route path="/register" element={<RegisterForm />} />
         <Route path="/login" element={<Authentication />} />
         <Route path="/aboutus" element={<AboutUs />} />
+        <Route path="/products" element={<ProductGallery />} />
+
         
         {/* Protected Route for Dashboard */}
         <Route
